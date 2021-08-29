@@ -1,0 +1,60 @@
+---
+Equipo 48 
+date: 18/04/2021
+---
+
+```{r}
+#install.packages("readxl")
+library("readxl")
+library("fpp2")
+#install.packages("forecast")
+library("forecast")
+```
+
+#Lectura de archivo csv
+```{r}
+INPC<-read.csv("INPC.csv", header=TRUE, stringsAsFactors = FALSE)
+head(INPC)
+```
+
+#Crear objeto de tipo time series sobre para índice general y subyacente:
+```{r}
+general <- ts(INPC[,2],24, start=c(2000), end=c(2021))
+subyacente <- ts(INPC[,3],24, start=c(2000), end=c(2021))
+```
+
+#Gráfica de índices
+```{r}
+general <- decompose(general)
+plot(components_general)
+components_subyacente <- decompose(subyacente)
+plot(components_subyacente)
+```
+
+#Rangos de entrenamiento y prueba:
+```{r}
+generalt <- window(general,end=c(2020))
+generalf <- window(general,start=c(2020))
+subyacentet <- window(subyacente,end=c(2020))
+subyacentef <- window(subyacente,start=c(2020))
+```
+#Valores de alpha y gama:
+```{r}
+ses.general <- ses(generalt, alpha = .905065, h = 100)
+ses.general <- ses(generalt, gama = .332579, h = 100)
+
+ses.subyacente <- ses(subyacentet, alpha = .917063, h = 100)
+ses.subyacente <- ses(subyacentet, gama = .055799, h = 100)
+```
+
+#Double Exponential Smoothing Methonds: Holt Linear Trend Method ETS(Errores aditivos, Tendencia asditiva, No estacionalidad )
+```{r}
+holt <- holt(generalt,h=519)
+plot(holt,main="Pronósticos de variación anual de INPC General",ylab="Índice de inflación",xlab="Fecha")
+lines(generalf,lty=3)
+```
+```{r}
+holt <- holt(subyacentet,h=519)
+plot(holt,main="Pronósticos de variación anual de INPC Subyacente",ylab="Índice de inflación",xlab="Fecha")
+lines(subyacentef,lty=3)
+```
